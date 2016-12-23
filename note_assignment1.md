@@ -1,4 +1,4 @@
-## KNN
+# KNN
 #### compute_distances_two_loops
 略  
 #### predict_labels
@@ -16,3 +16,25 @@ test与train.T进行dot乘，[i,j]位置的值为test[i]与train[j]每个元素�
 最后的distance则是两个平方和矩阵相加减去第三个矩阵乘以2  
 #### Cross-validation
 略  
+
+# softmax
+
+#### softmax_loss_vectorized (Naive略去)
+Middle=X.dot(W);  
+exp_matrix=np.exp(Middle);    
+计算loss直接按照如下函数计算即可  
+$J(W)=-1/N*[\sum_{i=1}^{N} log(\frac{exp\_matrix[i][y_i]}{sum(exp\_matrix[i][:])})]$  
+难点是计算dW，变形可得  
+$J(W)=-1/N*[\sum_{i=1}^{N} log(exp\_matrix[i][y_i])-log(sum(exp\_matrix[i][:]))]$  
+$J(W)=-1/N*[\sum_{i=1}^{N} Middle[i][y_i]-log(\sum_k(e^{Middle[i][k]}))]$
+我们最终的目的是求dW，可以先求dMiddle  
+可以看到后半部分是对称的，前半部分只影响到了 $[i,y_i]$ 的那一项  
+后半部分求导为 $1/N*\frac{e^{Middle[i][j]}}{\sum_k(e^{Middle[i][k]})}$  
+矩阵求导有如下公式:  
+**如果有Z=X.dot(Y)，那么dX=dZ.dot(Y.T), dY=X.T.dot(dZ)**  
+由于Middle=X.dot(W);  
+可以得到dW=X.T.dot(dMiddle);  
+最后记得加regression:  
+loss += 0.5 * reg * np.sum(W * W);  
+dW += reg * W;  
+最后实现LinearClassifier里的train和predict即可。  
