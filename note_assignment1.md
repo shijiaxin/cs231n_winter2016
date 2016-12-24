@@ -70,3 +70,6 @@ dscore的求法和softmax完全一样，求完后，套用之前描述的矩阵�
 需要注意的是，对于scores = H1.dot(W2)+b2  
 scores=(N,C), b2=(C,)  
 因此求db2的时候，每个值等于dscores对应一列的和  
+
+# Features
+略  
