@@ -38,3 +38,19 @@ $J(W)=-1/N*[\sum_{i=1}^{N} Middle[i][y_i]-log(\sum_k(e^{Middle[i][k]}))]$
 loss += 0.5 * reg * np.sum(W * W);  
 dW += reg * W;  
 最后实现LinearClassifier里的train和predict即可。  
+
+# SVM
+#### svm_loss_naive
+可以看到，只有margin > 0的时候，loss增加，因为scores=X[i].dot(W),  
+因此对scores[j]有贡献的只有W[:,j]这一列，因此可以得到dW[:,j]+=X[i]  
+类似的，dW[:,y[i]]-=X[i]  
+
+#### svm_loss_vectorized
+首先列出loss的公式:  
+$score=X.dot(W)$ 是分数矩阵  
+$L=1/N*\sum_{i=1}^{N} \sum_{j\not=y_i} max(0,score[i][j]-score[i][y_i]+1)$  
+首先先计算dscore，最后再算dW  
+可以先计算出$margin[i][j]=score[i][j]-score[i][y_i]+1$  
+如果margin[i][j]<=0的话，dscore[i][j]为0，否则为1  
+dscore[i][$y_i$]则是负数，看它被计算过几次  
+最后，类似的，求出dscore后再求dW  
