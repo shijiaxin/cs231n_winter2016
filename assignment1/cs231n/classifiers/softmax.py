@@ -69,18 +69,16 @@ def softmax_loss_vectorized(W, X, y, reg):
   #############################################################################
   C=np.max(y)+1;
   N=X.shape[0];
-  exp_matrix=np.exp(X.dot(W));
-  row_sum=exp_matrix.sum(axis=1);
-  row_correct=exp_matrix[np.arange(N),y];
-  loss=-1.0/N*np.sum(np.log(row_correct/row_sum));
+  scores=X.dot(W);
+  exp_scores=np.exp(scores-scores.max(axis=1,keepdims=True));
+  probs=exp_scores/exp_scores.sum(axis=1,keepdims=True);
+  loss=-1.0/N*np.sum(np.log(probs[np.arange(N),y]));
   loss += 0.5 * reg * np.sum(W * W);
 
-  # Middle = X.dot(W);
-  dMiddle=np.zeros((N,C));
-  dMiddle[np.arange(N),y]-=1;
-  dMiddle+=exp_matrix/(row_sum.reshape(N,1));
-  dMiddle/=N;
-  dW=X.T.dot(dMiddle);
+  dscores=probs;
+  dscores[np.arange(N),y]-=1;
+  dscores/=N;
+  dW=X.T.dot(dscores);
   dW += reg * W;
   #############################################################################
   #                          END OF YOUR CODE                                 #

@@ -74,11 +74,12 @@ class TwoLayerNet(object):
     # Store the result in the scores variable, which should be an array of      #
     # shape (N, C).                                                             #
     #############################################################################
-    pass
+    H1 = np.maximum(X.dot(W1)+b1,0);
+    scores = H1.dot(W2)+b2;
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
-    
+
     # If the targets are not given then jump out, we're done
     if y is None:
       return scores
@@ -92,7 +93,10 @@ class TwoLayerNet(object):
     # classifier loss. So that your results match ours, multiply the            #
     # regularization loss by 0.5                                                #
     #############################################################################
-    pass
+    exp_scores=np.exp(scores-scores.max(axis=1,keepdims=True));
+    probs=exp_scores/exp_scores.sum(axis=1,keepdims=True);
+    loss=-1.0/N*np.sum(np.log(probs[np.arange(N),y]));
+    loss += 0.5 * reg * np.sum(W1 * W1)+ 0.5*reg*np.sum(W2 * W2);
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -104,7 +108,23 @@ class TwoLayerNet(object):
     # and biases. Store the results in the grads dictionary. For example,       #
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
-    pass
+    dscores=probs;
+    dscores[np.arange(N),y]-=1;
+    dscores/=N; #(N,C)
+
+    #scores = H1.dot(W2)+b2;
+    dW2 = H1.T.dot(dscores) + reg*W2;
+    db2 = dscores.sum(axis=0);
+    dH1 = dscores.dot(W2.T)
+    dH1[H1<=0]=0;
+
+    dW1 = X.T.dot(dH1) + reg*W1;
+    db1 = dH1.sum(axis=0);
+
+    grads['W2']=dW2;
+    grads['b2']=db2;
+    grads['W1']=dW1;
+    grads['b1']=db1;
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -214,5 +234,3 @@ class TwoLayerNet(object):
     ###########################################################################
 
     return y_pred
-
-

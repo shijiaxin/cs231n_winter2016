@@ -20,16 +20,26 @@ test与train.T进行dot乘，[i,j]位置的值为test[i]与train[j]每个元素�
 # softmax
 
 #### softmax_loss_vectorized (Naive略去)
-Middle=X.dot(W);  
-exp_matrix=np.exp(Middle);    
+$scores=X.dot(W);$  
+$exp\_scores=np.exp(scores);$    
+不过实际代码用的是如下这行，计算probs时候结果不变，精度更高。  
+$exp\_scores=np.exp(scores-scores.max(axis=1,keepdims=True));$  
+$probs=exp\_scores/exp\_scores.sum(axis=1,keepdims=True);$  
+这里probs[i][j]表示的是对于输入X[i]，得到类别j的概率  
 计算loss直接按照如下函数计算即可  
-$J(W)=-1/N*[\sum_{i=1}^{N} log(\frac{exp\_matrix[i][y_i]}{sum(exp\_matrix[i][:])})]$  
-难点是计算dW，变形可得  
-$J(W)=-1/N*[\sum_{i=1}^{N} log(exp\_matrix[i][y_i])-log(sum(exp\_matrix[i][:]))]$  
-$J(W)=-1/N*[\sum_{i=1}^{N} Middle[i][y_i]-log(\sum_k(e^{Middle[i][k]}))]$
-我们最终的目的是求dW，可以先求dMiddle  
-可以看到后半部分是对称的，前半部分只影响到了 $[i,y_i]$ 的那一项  
-后半部分求导为 $1/N*\frac{e^{Middle[i][j]}}{\sum_k(e^{Middle[i][k]})}$  
+$J(W)=-1/N*\sum_{i=1}^{N} log(probs[i][y_i])$  
+难点是计算dW，把probs用score代替，变形可得  
+$J(W)=-1/N*\sum_{i=1}^{N} log(\frac{exp\_scores[i][y_i]}{sum(exp\_scores[i][:])})$  
+$J(W)=-1/N*\sum_{i=1}^{N} [log(exp\_scores[i][y_i])-log(sum(exp\_scores[i][:]))]$  
+$J(W)=-1/N*\sum_{i=1}^{N} [scores[i][y_i]-log(\sum_k(e^{scores[i][k]}))]$  
+我们最终的目的是求dW，可以先求dscores  
+可以看到 [ ] 内的后半部分是对称的，前半部分则只涉及到影响到了 $[i][y_i]$ 的那一项  
+只看 [ ]内 ，前半部分导数为1，而且只影响 $[i][y_i]$ 的那一项，后半部分求导为  
+$-\frac{e^{scores[i][j]}}{\sum_k(e^{scores[i][k]})}=-probs[i][j]$  
+因此转化为实际代码  
+dscores=probs;  
+dscores[np.arange(N),y]-=1;  
+dscores/=N;  
 矩阵求导有如下公式:  
 **如果有Z=X.dot(Y)，那么dX=dZ.dot(Y.T), dY=X.T.dot(dZ)**  
 由于Middle=X.dot(W);  
