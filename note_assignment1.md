@@ -64,3 +64,9 @@ $L=1/N*\sum_{i=1}^{N} \sum_{j\not=y_i} max(0,score[i][j]-score[i][y_i]+1)$
 如果margin[i][j]<=0的话，dscore[i][j]为0，否则为1  
 dscore[i][$y_i$]则是负数，看它被计算过几次  
 最后，类似的，求出dscore后再求dW  
+
+# TwoLayerNet
+dscore的求法和softmax完全一样，求完后，套用之前描述的矩阵求导公式即可  
+需要注意的是，对于scores = H1.dot(W2)+b2  
+scores=(N,C), b2=(C,)  
+因此求db2的时候，每个值等于dscores对应一列的和  
