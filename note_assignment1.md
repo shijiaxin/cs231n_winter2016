@@ -1,5 +1,3 @@
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
 # KNN
 #### compute_distances_two_loops
 略  
@@ -29,11 +27,11 @@ $exp\_scores=np.exp(scores-scores.max(axis=1,keepdims=True));$
 $probs=exp\_scores/exp\_scores.sum(axis=1,keepdims=True);$  
 这里probs[i][j]表示的是对于输入X[i]，得到类别j的概率  
 计算loss直接按照如下函数计算即可  
-$$J(W)=-1/N*\sum_{i=1}^{N} log(probs[i][y_i])$$  
+$J(W)=-1/N*\sum_{i=1}^{N} log(probs[i][y_i])$  
 难点是计算dW，把probs用score代替，变形可得  
-$$J(W)=-1/N*\sum_{i=1}^{N} log(\frac{exp\_scores[i][y_i]}{sum(exp\_scores[i][:])})$$  
-$$J(W)=-1/N*\sum_{i=1}^{N} [log(exp\_scores[i][y_i])-log(sum(exp\_scores[i][:]))]$$  
-$$J(W)=-1/N*\sum_{i=1}^{N} [scores[i][y_i]-log(\sum_k(e^{scores[i][k]}))]$$  
+$J(W)=-1/N*\sum_{i=1}^{N} log(\frac{exp\_scores[i][y_i]}{sum(exp\_scores[i][:])})$  
+$J(W)=-1/N*\sum_{i=1}^{N} [log(exp\_scores[i][y_i])-log(sum(exp\_scores[i][:]))]$  
+$J(W)=-1/N*\sum_{i=1}^{N} [scores[i][y_i]-log(\sum_k(e^{scores[i][k]}))]$  
 我们最终的目的是求dW，可以先求dscores  
 可以看到 [ ] 内的后半部分是对称的，前半部分则只涉及到影响到了 $[i][y_i]$ 的那一项  
 只看 [ ]内 ，前半部分导数为1，而且只影响 $[i][y_i]$ 的那一项，后半部分求导为  
