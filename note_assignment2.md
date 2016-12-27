@@ -31,3 +31,15 @@ $v_t=β_2v_{t−1}+(1−β_2)g_t^2$
 $\hat{m}_t=\frac{m_t}{1-β_1^t}$  
 $\hat{v}_t=\frac {v_t} {1-β_2^t}$  
 $W=W-\frac{\eta}{\sqrt{\hat{v}_t}+\epsilon}*\hat{m}_t$
+
+# Batch Normalization
+如果不考虑back forward，计算out其实不难，公式如下:  
+sample_mean=x.mean(axis=0);  
+sample_var=((x-sample_mean)\*\*2).mean(axis=0);  
+xhat=(x-sample_mean)/(np.sqrt(sample_var)+eps);  
+out=xhat*gamma+beta;  
+但是为了计算back forward，需要写得更加详细些，具体见代码。  
+时刻记住链式法则即可：  
+$\frac{\partial f}{\partial x} = \frac{\partial f}{\partial z} * \frac{\partial z}{\partial x}$  
+z是x的某个函数，f是z的某个函数  
+因此$dx=dz*\frac{\partial z}{\partial x}$  

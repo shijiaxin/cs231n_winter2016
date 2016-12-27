@@ -171,7 +171,22 @@ def batchnorm_forward(x, gamma, beta, bn_param):
     # the momentum variable to update the running mean and running variance,    #
     # storing your result in the running_mean and running_var variables.        #
     #############################################################################
-    pass
+    #sample_mean=x.mean(axis=0);
+    #sample_var=((x-sample_mean)**2).mean(axis=0);
+    #xhat=(x-sample_mean)/(np.sqrt(sample_var)+eps);
+    #out=xhat*gamma+beta;
+    sample_mean=x.mean(axis=0);  #(D,)
+    xcentered = x - sample_mean; #(N, D)
+    xcentered2 = xcentered**2    #(N, D)
+    sample_var = np.mean(xcentered2, axis=0)  #(D,)
+    std = np.sqrt(sample_var + eps)     #(D,)
+    stdinv = 1 / std                    #1 / (D,)
+    xhat = xcentered * stdinv           #(N, D) * (D,)
+    out = gamma * xhat + beta           #(D,) * (N, D) + (D,)
+    cache = (gamma, xhat, stdinv, std, xcentered)
+
+    running_mean = momentum * running_mean + (1 - momentum) * sample_mean
+    running_var = momentum * running_var + (1 - momentum) * sample_var
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -182,7 +197,8 @@ def batchnorm_forward(x, gamma, beta, bn_param):
     # and shift the normalized data using gamma and beta. Store the result in   #
     # the out variable.                                                         #
     #############################################################################
-    pass
+    xhat=(x-running_mean)/np.sqrt(running_var+eps);
+    out=xhat*gamma+beta;
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -218,7 +234,29 @@ def batchnorm_backward(dout, cache):
   # TODO: Implement the backward pass for batch normalization. Store the      #
   # results in the dx, dgamma, and dbeta variables.                           #
   #############################################################################
-  pass
+  #sample_mean=x.mean(axis=0);  #(D,)
+  #xcentered = x - sample_mean; #(N, D)
+  #xcentered2 = xcentered**2    #(N, D)
+  #sample_var = np.mean(xcentered2, axis=0)  #(D,)
+  #std = np.sqrt(sample_var + eps)     #(D,)
+  #stdinv = 1 / std                    #1 / (D,)
+  #xhat = xcentered * stdinv           #(N, D) * (D,)
+  #out = gamma * xhat + beta           #(D,) * (N, D) + (D,)
+  #cache = (gamma, xhat, stdinv, std, xcentered)
+  N, D = dout.shape;
+  gamma, xhat, stdinv, std, xcentered = cache
+  dbeta=dout.sum(axis=0);
+  dgamma=(dout * xhat).sum(axis=0);    #(D,)
+  dxhat=gamma*dout;                    #(N, D)
+  dxcentered = dxhat*stdinv                 #(N, D), not correct now
+  dstdinv = (xcentered*dxhat).sum(axis=0);  #(D,)
+  dstd=dstdinv*(-1)/(std*std)                #(D,)
+  #dsample_var=dstd/(2*np.sqrt(sample_var + eps)) #(D,)
+  dsample_var=dstd/(2*std) #(D,)
+  dxcentered2=dsample_var* np.ones((N, D)) /N
+  dxcentered+=2*dxcentered2*xcentered;
+  dsample_mean=-1*dxcentered.sum(axis=0);
+  dx=dxcentered+dsample_mean * np.ones((N, D)) / N
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
