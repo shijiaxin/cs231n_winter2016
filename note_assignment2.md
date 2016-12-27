@@ -51,3 +51,17 @@ np.random.rand的参数必须是整数，而不是list，无法如下调用：
 np.random.rand(x.shape)  
 必须要  
 np.random.rand(*x.shape)  
+
+# Convolution Network
+#### Convolution forward
+np.lib.pad的第二个参数是一系列的(before,after)pair，表示该纬度的前后需要加多少个padding  
+举个栗子:  
+np.lib.pad(input,((0,0),(pad,pad),(pad,pad)),'constant', constant_values=0);  
+这个表示input的第一个纬度不加padding，第二第三纬度都要前后加两个padding，padding内容为0  
+选取ndarray的某个子ndarray时候，应该用如下格式:  
+padx[:,h1:h2,w1:w2]  
+而不是如下格式:  
+padx[:][h1:h2][w1:w2]  
+
+#### Convolution backward
+直接的思路就是保持原有的循环，把forward的代码换成backward  

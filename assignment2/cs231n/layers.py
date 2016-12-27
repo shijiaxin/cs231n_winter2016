@@ -398,7 +398,22 @@ def conv_forward_naive(x, w, b, conv_param):
   # TODO: Implement the convolutional forward pass.                           #
   # Hint: you can use the function np.pad for padding.                        #
   #############################################################################
-  pass
+  N, C, H, W = x.shape;
+  F, C, HH, WW = w.shape;
+  F, =b.shape;
+  pad=conv_param['pad'];
+  stride=conv_param['stride'];
+  Hout=1 + (H + 2 * pad - HH) / stride;
+  Wout=1 + (W + 2 * pad - WW) / stride;
+  out=np.zeros((N, F,Hout,Wout));
+  for n in xrange(N):
+    padx=np.lib.pad(x[n],((0,0),(pad,pad),(pad,pad)),'constant', constant_values=0);
+    for f in xrange(F):
+      for i in xrange(Hout):
+        for j in xrange(Wout):
+          h1,h2=i*stride,i*stride+HH;
+          w1,w2=j*stride,j*stride+WW;
+          out[n][f][i][j]=np.sum(padx[:,h1:h2,w1:w2]*w[f])+b[f];
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -423,7 +438,31 @@ def conv_backward_naive(dout, cache):
   #############################################################################
   # TODO: Implement the convolutional backward pass.                          #
   #############################################################################
-  pass
+  x, w, b, conv_param= cache ;
+  N, C, H, W = x.shape;
+  F, C, HH, WW = w.shape;
+  F, =b.shape;
+  pad=conv_param['pad'];
+  stride=conv_param['stride'];
+  Hout=1 + (H + 2 * pad - HH) / stride;
+  Wout=1 + (W + 2 * pad - WW) / stride;
+  ##above are the same
+  dx, dw, db = np.zeros_like(x),np.zeros_like(w),np.zeros_like(b);
+
+  for n in xrange(N):
+    padx=np.lib.pad(x[n],((0,0),(pad,pad),(pad,pad)),'constant', constant_values=0);
+    dpadx=np.zeros_like(padx);
+    for f in xrange(F):
+      for i in xrange(Hout):
+        for j in xrange(Wout):
+          h1,h2=i*stride,i*stride+HH;
+          w1,w2=j*stride,j*stride+WW;
+          #out[n][f][i][j]=np.sum(padx[:,h1:h2,w1:w2]*w[f])+b[f];
+          dpadx[:,h1:h2,w1:w2]+=dout[n][f][i][j]*w[f];
+          dw[f]+=dout[n][f][i][j]*padx[:,h1:h2,w1:w2];
+          db[f]+=dout[n][f][i][j];
+    dx[n]=dpadx[:,pad:-pad,pad:-pad];
+
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
