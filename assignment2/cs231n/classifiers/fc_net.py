@@ -176,7 +176,9 @@ class FullyConnectedNet(object):
     for l in xrange(self.num_layers):
       self.params[('W',l)]=np.random.normal(size=(all_dims[l],all_dims[l+1]),scale=weight_scale);
       self.params[('b',l)]=np.zeros(all_dims[l+1]);
-
+      if(l!=self.num_layers-1 and self.use_batchnorm):
+        self.params[('gamma',l)]=np.ones(all_dims[l+1]);
+        self.params[('beta',l)]=np.zeros(all_dims[l+1]);
     ############################################################################
     #                             END OF YOUR CODE                             #
     ############################################################################
@@ -237,7 +239,11 @@ class FullyConnectedNet(object):
     out = {}
     cache = {}
     for l in xrange(self.num_layers-1):
-        out[l],cache[l] = affine_relu_forward(X if (l==0) else out[l-1],self.params[('W',l)],self.params[('b',l)]);
+        if self.use_batchnorm:
+            out[l],cache[l] = affine_batchnorm_relu_forward(X if (l==0) else out[l-1],self.params[('W',l)],self.params[('b',l)],
+                    self.params[('gamma',l)], self.params[('beta',l)],self.bn_params[l]);
+        else:
+            out[l],cache[l] = affine_relu_forward(X if (l==0) else out[l-1],self.params[('W',l)],self.params[('b',l)]);
     last_l=self.num_layers-1;
     out[last_l],cache[last_l]=affine_forward(out[last_l-1],self.params[('W',last_l)],self.params[('b',last_l)]);
     scores=out[last_l];
@@ -269,7 +275,11 @@ class FullyConnectedNet(object):
         loss+=0.5*self.reg*np.sum(self.params[('W',l)]*self.params[('W',l)]);
     dout[last_l-1],grads[('W',last_l)],grads[('b',last_l)]=affine_backward(dout[last_l],cache[last_l]);
     for l in range(self.num_layers-2,-1,-1):
-        dout[l-1],grads[('W',l)],grads[('b',l)]=affine_relu_backward(dout[l],cache[l]);
+        if self.use_batchnorm:
+            dout[l-1],grads[('W',l)],grads[('b',l)],grads[('gamma',l)],\
+                grads[('beta',l)]=affine_batchnorm_relu_backward(dout[l],cache[l]);
+        else:
+            dout[l-1],grads[('W',l)],grads[('b',l)]=affine_relu_backward(dout[l],cache[l]);
     for l in xrange(self.num_layers-1):
         grads[('W',l)]+=self.reg*self.params[('W',l)];
     ############################################################################

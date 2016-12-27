@@ -40,6 +40,9 @@ xhat=(x-sample_mean)/(np.sqrt(sample_var)+eps);
 out=xhat*gamma+beta;  
 但是为了计算back forward，需要写得更加详细些，具体见代码。  
 时刻记住链式法则即可：  
-$\frac{\partial f}{\partial x} = \frac{\partial f}{\partial z} * \frac{\partial z}{\partial x}$  
-z是x的某个函数，f是z的某个函数  
-因此$dx=dz*\frac{\partial z}{\partial x}$  
+$\frac{\partial f}{\partial x} = \frac{\partial f}{\partial z} * \frac{\partial z}{\partial x}$   
+$\frac{\partial f}{\partial y} = \frac{\partial f}{\partial z} * \frac{\partial z}{\partial y}$   
+z是x和y的某个函数，f是z的某个函数  
+因此  
+$dx=dz*\frac{\partial z}{\partial x}$  
+$dy=dz*\frac{\partial z}{\partial y}$  
