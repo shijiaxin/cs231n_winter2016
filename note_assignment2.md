@@ -46,3 +46,8 @@ z是x和y的某个函数，f是z的某个函数
 因此  
 $dx=dz*\frac{\partial z}{\partial x}$  
 $dy=dz*\frac{\partial z}{\partial y}$  
+# Dropout
+np.random.rand的参数必须是整数，而不是list，无法如下调用：  
+np.random.rand(x.shape)  
+必须要  
+np.random.rand(*x.shape)  
