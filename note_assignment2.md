@@ -74,3 +74,12 @@ np.max(x,axis=(2,3));
 #### Three-layer ConvNet
 参考fc_net里面的TwoLayerNet的实现方式即可。  
 唯一需要注意的是计算参数矩阵的大小，以及reshape第一层的输出。  
+
+#### Spatial batch normalization
+batch normalization通常x是(N,D)的，  
+而对于ConvNet来说不同channel的值是同一个点的不同特征  
+因此需要把(N,C,H,W)的输入数据转化为(N\*H\*W,C)的格式  
+需要先调用transpose(0, 2, 3, 1)，把C换到最后一个维度，再reshape  
+
+#### Train a really good model on CIFAR-10
+暂时略过  
