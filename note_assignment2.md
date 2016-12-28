@@ -65,3 +65,12 @@ padx[:][h1:h2][w1:w2]
 
 #### Convolution backward
 直接的思路就是保持原有的循环，把forward的代码换成backward  
+
+#### Max pooling
+如果x=(n1,n2,n3,n4);  
+np.max(x,axis=(2,3));  
+可以得到一个(n1,n2)的矩阵，每个元素是后面的(n3,n4)矩阵的最大值  
+
+#### Three-layer ConvNet
+参考fc_net里面的TwoLayerNet的实现方式即可。  
+唯一需要注意的是计算参数矩阵的大小，以及reshape第一层的输出。  
