@@ -82,4 +82,4 @@ batch normalization通常x是(N,D)的，
 需要先调用transpose(0, 2, 3, 1)，把C换到最后一个维度，再reshape  
 
 #### Train a really good model on CIFAR-10
-暂时略过  
+暂时没有完成，TODO  
