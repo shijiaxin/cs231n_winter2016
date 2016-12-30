@@ -35,3 +35,10 @@ word -> word_vector
 hidden_state -> hidden_state  即RNN  
 hidden_state -> word  
 然后给的数据是包含image_features和最后的输出，希望训练出这些参数  
+
+# LSTM
+#### LSTM: step forward & backward
+和计算其他的forward和backward非常类似  
+里面需要sigmoid的backward，公式如下:  
+y=sigmoid(x)，则dx=dy\*y\*(1-y);  
+np.concatenate([v1, v2], axis=1)可以连接两个矩阵  

@@ -270,7 +270,16 @@ def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
   # TODO: Implement the forward pass for a single timestep of an LSTM.        #
   # You may want to use the numerically stable sigmoid implementation above.  #
   #############################################################################
-  pass
+  N,D=x.shape;
+  _,H=prev_h.shape;
+  a=x.dot(Wx)+prev_h.dot(Wh)+b;
+  i=sigmoid(a[:,0:H]);
+  f=sigmoid(a[:,H:2*H]);
+  o=sigmoid(a[:,2*H:3*H]);
+  g=np.tanh(a[:,3*H:]);
+  next_c=f*prev_c+i*g;
+  next_h=o*np.tanh(next_c);
+  cache=(x, prev_h, prev_c, Wx, Wh, b);
   ##############################################################################
   #                               END OF YOUR CODE                             #
   ##############################################################################
@@ -302,7 +311,38 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
   # HINT: For sigmoid and tanh you can compute local derivatives in terms of  #
   # the output value from the nonlinearity.                                   #
   #############################################################################
-  pass
+  (x, prev_h, prev_c, Wx, Wh, b)=cache;
+  N,D=x.shape;
+  _,H=prev_h.shape;
+  a=x.dot(Wx)+prev_h.dot(Wh)+b;
+  i=sigmoid(a[:,0:H]);
+  f=sigmoid(a[:,H:2*H]);
+  o=sigmoid(a[:,2*H:3*H]);
+  g=np.tanh(a[:,3*H:]);
+  next_c=f*prev_c+i*g;
+  middle=np.tanh(next_c);
+  next_h=o*middle;
+  ## re-compute necessary things;
+
+  do=dnext_h*middle;
+  dmiddle=dnext_h*o;
+  # y=tanh(x) y'=1-y^2
+  dnext_c+=(1 - middle**2)* dmiddle
+  df=dnext_c*prev_c;
+  di=dnext_c*g;
+  dg=dnext_c*i;
+  dprev_c=dnext_c*f;
+  di_sigmoid = di * (i*(1-i))
+  df_sigmoid = df * (f*(1-f))
+  do_sigmoid = do * (o*(1-o))
+  dg_tanh    = (1 - g**2)* dg
+  da = np.concatenate([di_sigmoid, df_sigmoid, do_sigmoid, dg_tanh], axis=1);
+  #a=x.dot(Wx)+prev_h.dot(Wh)+b;
+  dx=da.dot(Wx.T);
+  dWx=x.T.dot(da);
+  dprev_h=da.dot(Wh.T);
+  dWh=prev_h.T.dot(da);
+  db=da.sum(axis=0);
   ##############################################################################
   #                               END OF YOUR CODE                             #
   ##############################################################################
