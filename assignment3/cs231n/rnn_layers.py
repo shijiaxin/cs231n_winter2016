@@ -182,7 +182,13 @@ def word_embedding_forward(x, W):
   #                                                                            #
   # HINT: This should be very simple.                                          #
   ##############################################################################
-  pass
+  N,T = x.shape;
+  V,D = W.shape;
+  out=np.zeros((N, T, D));
+  for n in xrange(N):
+    for t in xrange(T):
+      out[n,t,:]=W[x[n,t]];
+  cache=x,W,V;
   ##############################################################################
   #                               END OF YOUR CODE                             #
   ##############################################################################
@@ -210,7 +216,15 @@ def word_embedding_backward(dout, cache):
   #                                                                            #
   # HINT: Look up the function np.add.at                                       #
   ##############################################################################
-  pass
+  x,W,V=cache;
+  N,T = x.shape;
+  V,D = W.shape;
+  dW=np.zeros_like(W);
+  for n in xrange(N):
+    for t in xrange(T):
+      idx=x[n,t];
+      #out[n,t,:]=W[idx];
+      dW[idx]+=dout[n,t,:];
   ##############################################################################
   #                               END OF YOUR CODE                             #
   ##############################################################################

@@ -25,3 +25,13 @@ dnext_h的值应该是多少？
 h3的值会影响d3，因此dh3=d3  
 h2的值会影响h3和d2，即可以认为有两个函数都以h2为参数，  
 因此dh2应该是这两个函数的gradient的和，即d2+dprev(h3)  
+
+#### RNN for image captioning
+这一部分主要做的事情就是把所有的layer串起来。  
+Word_embedding是把每个word转化成一个vector，转化方式也是通过学习出来的。  
+最后有4组参数：
+image_features -> init_hidden_state  
+word -> word_vector  
+hidden_state -> hidden_state  即RNN  
+hidden_state -> word  
+然后给的数据是包含image_features和最后的输出，希望训练出这些参数  
