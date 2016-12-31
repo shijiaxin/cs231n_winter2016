@@ -42,3 +42,7 @@ hidden_state -> word
 里面需要sigmoid的backward，公式如下:  
 y=sigmoid(x)，则dx=dy\*y\*(1-y);  
 np.concatenate([v1, v2], axis=1)可以连接两个矩阵  
+
+#### LSTM: forward & backward
+和RNN部分的代码十分类似  
+区别是每个step的cache存起来了，而不是临时构造。
